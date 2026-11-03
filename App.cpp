@@ -1,88 +1,53 @@
 #include "App.h"
+
 #include "BrandWindow.h"
 #include "TypeWindow.h"
 #include "DetailedWindow.h"
-#include "EditTypeWindow.h"
+#include "EditWindow.h"
 
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
-#include <GLFW/glfw3.h>
-#include <GL/gl.h>
-#include <iostream>
+#include <utility>
 
-App::App(Database& database)
-    : db(database),
-    editTypeWindow(database),
-    detailedWindow(database, editTypeWindow),
-    typeWindow(database, detailedWindow, editTypeWindow),
-    brandWindow(database, typeWindow) {
-    windows = { &brandWindow, &typeWindow, &detailedWindow, &editTypeWindow };
-}
+App::App(Database& database, ImageManager& imageManager)
+{
+    auto editWindow = std::make_unique<EditWindow>(database);
 
-int App::Run() {
-    if (!glfwInit()) {
-        std::cerr << "GLFW initialization failed.\n";
-        return 1;
-    }
-
-    window = glfwCreateWindow(
-        1920, 1080, "OO-Programmeren", nullptr, nullptr
+    auto detailedWindow = std::make_unique<DetailedWindow>(
+        database,
+        imageManager,
+        *editWindow
     );
 
-    if (window == nullptr) {
-        std::cerr << "Could not create GLFW window.\n";
-        glfwTerminate();
-        return 1;
+    auto typeWindow = std::make_unique<TypeWindow>(
+        database,
+        *detailedWindow
+    );
+
+    auto brandWindow = std::make_unique<BrandWindow>(
+        database,
+        imageManager,
+        *typeWindow
+    );
+
+    AddWindow(std::move(editWindow));
+    AddWindow(std::move(detailedWindow));
+    AddWindow(std::move(typeWindow));
+    AddWindow(std::move(brandWindow), true);
+}
+
+void App::AddWindow(std::unique_ptr<IWindow> window, bool openAtStart)
+{
+    if (openAtStart)
+    {
+        window->Open();
     }
 
-    glfwMakeContextCurrent(window);
+    windows.push_back(std::move(window));
+}
 
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init("#version 130");
-
-    while (!glfwWindowShouldClose(window)) {
-        glfwPollEvents();
-
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
-        for (Window* screen : windows) {
-            screen->Render();
-        }
-
-        if (editTypeWindow.TakeChanged()) {          // er is iets toegevoegd, gewijzigd of verwijderd
-            for (Window* screen : windows) {
-                screen->Reload();                    // elk window laadt zijn gegevens opnieuw
-            }
-        }
-
-        ImGui::Render();
-
-        int w, h;
-        glfwGetFramebufferSize(window, &w, &h);
-
-        glViewport(0, 0, w, h);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        ImGui_ImplOpenGL3_RenderDrawData(
-            ImGui::GetDrawData()
-        );
-
-        glfwSwapBuffers(window);
+void App::Render()
+{
+    for (const auto& window : windows)
+    {
+        window->Render();
     }
-
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
-
-    glfwDestroyWindow(window);
-    window = nullptr;
-    glfwTerminate();
-
-    return 0;
 }

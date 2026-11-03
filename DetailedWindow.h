@@ -2,25 +2,43 @@
 
 #include "Window.h"
 #include "Database.h"
+#include "ImageManager.h"
 
-class EditTypeWindow;
+class EditWindow;
 
-class DetailedWindow : public Window {
+class DetailedWindow : public Window
+{
 private:
-    EditTypeWindow& editWindow;
-    int typeID = 0;
     Database& db;
-    CarDetails details;
-    bool showKw = false;               // false = show PK, true = show kW (the choice stays when you open another car)
+    ImageManager& imageManager;
+    EditWindow& editWindow;
 
-    int PkToKw(int pk) const;          // converts PK to kW (1 PK = 0.7355 kW)
+    int selectedBrandID = -1;
+    int selectedTypeID = -1;
+    int selectedModelID = -1;
 
-protected:
-    void DrawContent() override;
+    std::string brandName;
+
+    BrandLocation location;
+    std::vector<CarDetails> models;
+
+    int showKW = 0;
+
+    char newModelName[128] = {};
+    int newModelPowerPS = 0;
+
+    std::string errorMessage;
+
+    void RefreshModels();
 
 public:
-    DetailedWindow(Database& database, EditTypeWindow& editTypeWindow);
+    DetailedWindow(
+        Database& database,
+        ImageManager& imageManager,
+        EditWindow& editWindow
+    );
 
-    void Show(int typeID);
-    void Reload() override;
+    void Show(int brandID, const std::string& brandName, int typeID);
+
+    void DrawContent() override;
 };

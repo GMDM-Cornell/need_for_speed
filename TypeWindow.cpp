@@ -1,83 +1,163 @@
 #include "TypeWindow.h"
-#include "imgui.h"
 #include "DetailedWindow.h"
-#include "EditTypeWindow.h"
+#include "imgui.h"
 
-TypeWindow::TypeWindow(
-    Database& database,
-    DetailedWindow& detailWin,
-    EditTypeWindow& editTypeWindow
-)
-    : Window("Types"),
+#include <cstdio>
+
+TypeWindow::TypeWindow(Database& database, DetailedWindow& detailedWindow)
+    : Window("Vehicle Types"),
     db(database),
-    detailedWindow(detailWin),
-    editWindow(editTypeWindow)
+    detailedWindow(detailedWindow)
 {
-    closable = true;
-    open = false;
 }
 
-void TypeWindow::Show(int brandID, const std::string& name) {
+void TypeWindow::Show(int brandID, const std::string& name)
+{
     selectedBrandID = brandID;
-    brandName = name;
-    types = db.GetTypes(brandID);
     selectedTypeID = -1;
-    open = true;
-    location = db.GetBrandLocation(selectedBrandID);
+    brandName = name;
+    errorMessage.clear();
+
+    location = db.GetBrandLocation(brandID);
+
+    RefreshTypes();
+
+    Open();
 }
 
-void TypeWindow::DrawContent() {
-    ImGui::Text("Types of %s:", brandName.c_str());
+void TypeWindow::RefreshTypes()
+{
+    types = db.GetTypes(selectedBrandID);
+}
 
-    ImGui::Text("Gevestigd in: %s, %s", location.city.c_str(), location.country.c_str());
+void TypeWindow::DrawContent()
+{
+    ImGui::Text("Brand: %s", brandName.c_str());
+
+    ImGui::Text(
+        "Headquarters: %s, %s",
+        location.city.c_str(),
+        location.country.c_str()
+    );
 
     ImGui::Separator();
 
-    ImGuiTableFlags flags = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg;
+    ImGui::Text("Add a vehicle type");
 
-    if (ImGui::BeginTable("TypesTabel", 2, flags)) {
-        ImGui::TableSetupColumn("#", ImGuiTableColumnFlags_WidthFixed, 40.0f);
-        ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthStretch);
+    ImGui::InputText(
+        "New vehicle type",
+        newTypeName,
+        sizeof(newTypeName)
+    );
+
+    if (ImGui::Button("Add vehicle type"))
+    {
+        if (db.AddVehicleType(selectedBrandID, newTypeName))
+        {
+            newTypeName[0] = '\0';
+            errorMessage.clear();
+            RefreshTypes();
+        }
+        else
+        {
+            errorMessage = db.GetLastError();
+        }
+    }
+
+    ImGui::Separator();
+
+    ImGui::Text("Available vehicle types");
+
+    if (ImGui::BeginTable(
+        "VehicleTypesTable",
+        1,
+        ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
+    {
+        ImGui::TableSetupColumn("Vehicle Type");
         ImGui::TableHeadersRow();
 
-        for (int i = 0; i < static_cast<int>(types.size()); i++) {
-            ImGui::PushID(types[i].id);
+        for (const VehicleType& type : types)
+        {
             ImGui::TableNextRow();
-
             ImGui::TableSetColumnIndex(0);
-            ImGui::Text("%d", i + 1);
 
-            ImGui::TableSetColumnIndex(1);
+            ImGui::PushID(type.id);
+
             if (ImGui::Selectable(
-                types[i].name.c_str(),
-                selectedTypeID == types[i].id))
+                type.name.c_str(),
+                selectedTypeID == type.id))
             {
-                selectedTypeID = types[i].id;
+                selectedTypeID = type.id;
 
-                detailedWindow.Show(types[i].id);
+                std::snprintf(
+                    editedTypeName,
+                    sizeof(editedTypeName),
+                    "%s",
+                    type.name.c_str()
+                );
+
+                detailedWindow.Show(selectedBrandID, brandName, type.id);
             }
 
             ImGui::PopID();
         }
+
         ImGui::EndTable();
     }
 
-    ImGui::Separator();
+    if (selectedTypeID != -1)
+    {
+        ImGui::Separator();
 
-    if (ImGui::Button("Nieuw type")) {
-        editWindow.ShowNew(selectedBrandID, brandName);
+        ImGui::Text("Edit selected vehicle type");
+
+        ImGui::InputText(
+            "Vehicle type name",
+            editedTypeName,
+            sizeof(editedTypeName)
+        );
+
+        if (ImGui::Button("Save vehicle type"))
+        {
+            if (db.UpdateVehicleType(selectedTypeID, editedTypeName))
+            {
+                errorMessage.clear();
+                RefreshTypes();
+
+                detailedWindow.Show(
+                    selectedBrandID,
+                    brandName,
+                    selectedTypeID
+                );
+            }
+            else
+            {
+                errorMessage = db.GetLastError();
+            }
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("Delete vehicle type"))
+        {
+            if (db.DeleteVehicleType(selectedTypeID))
+            {
+                selectedTypeID = -1;
+                errorMessage.clear();
+
+                detailedWindow.Close();
+
+                RefreshTypes();
+            }
+            else
+            {
+                errorMessage = db.GetLastError();
+            }
+        }
     }
-    ImGui::SameLine();
 
-    ImGui::BeginDisabled(selectedTypeID == -1);     // niets geselecteerd = knop grijs
-    if (ImGui::Button("Bewerken")) {
-        editWindow.ShowEdit(selectedTypeID);
+    if (!errorMessage.empty())
+    {
+        ImGui::TextWrapped("Error: %s", errorMessage.c_str());
     }
-    ImGui::EndDisabled();
-}
-
-void TypeWindow::Reload() {
-    if (selectedBrandID == -1) return;
-    types = db.GetTypes(selectedBrandID);
-    selectedTypeID = -1;
 }

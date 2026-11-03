@@ -1,27 +1,35 @@
 #pragma once
-#include <string>
-#include <vector>
+
 #include "Window.h"
 #include "Database.h"
 
 class DetailedWindow;
-class EditTypeWindow;
 
-class TypeWindow : public Window {
+class TypeWindow : public Window
+{
 private:
-    DetailedWindow& detailedWindow;
-    EditTypeWindow& editWindow;
     Database& db;
-    std::string brandName;
-    std::vector<ListItem> types;
-    BrandLocation location;
-    int selectedTypeID = -1;
+    DetailedWindow& detailedWindow;
+
     int selectedBrandID = -1;
-protected:
-    void DrawContent() override;
+    int selectedTypeID = -1;
+
+    std::string brandName;
+
+    BrandLocation location;
+    std::vector<VehicleType> types;
+
+    char newTypeName[128] = {};
+    char editedTypeName[128] = {};
+
+    std::string errorMessage;
+
+    void RefreshTypes();
 
 public:
-    TypeWindow(Database& database, DetailedWindow& detailWin, EditTypeWindow& editTypeWindow);
+    TypeWindow(Database& database, DetailedWindow& detailedWindow);
+
     void Show(int brandID, const std::string& name);
-    void Reload() override;
+
+    void DrawContent() override;
 };

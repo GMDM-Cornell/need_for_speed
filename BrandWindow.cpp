@@ -2,41 +2,86 @@
 #include "TypeWindow.h"
 #include "imgui.h"
 
-BrandWindow::BrandWindow(Database& database, TypeWindow& typeWin)
-    : Window("Merken"), db(database), typeWindow(typeWin) {
-    brands = db.GetBrands();
+#include <cstdint>
+
+BrandWindow::BrandWindow(
+    Database& database,
+    ImageManager& imageManager,
+    TypeWindow& typeWindow)
+    : Window("Brands", false),
+    db(database),
+    imageManager(imageManager),
+    typeWindow(typeWindow)
+{
+    RefreshBrands();
 }
 
-void BrandWindow::DrawContent() {
-    ImGui::Text("Merken uit de database:");
-    ImGui::Separator();
+void BrandWindow::RefreshBrands()
+{
+    imageManager.Clear();
 
-    ImGuiTableFlags flags = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg;
+    brands = db.GetBrands();
 
-    if (ImGui::BeginTable("MerkenTabel", 2, flags)) { 
-        ImGui::TableSetupColumn("#", ImGuiTableColumnFlags_WidthFixed, 40.0f);
-        ImGui::TableSetupColumn("Merk", ImGuiTableColumnFlags_WidthStretch);
+    for (const Brand& brand : brands)
+    {
+        std::vector<std::uint8_t> logo = db.GetBrandLogo(brand.id);
+
+        if (!logo.empty())
+        {
+            imageManager.LoadLogo(brand.id, logo);
+        }
+    }
+}
+
+void BrandWindow::DrawContent()
+{
+    ImGui::Text("Available brands");
+
+    if (ImGui::BeginTable(
+        "BrandTable",
+        2,
+        ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
+    {
+        ImGui::TableSetupColumn("Logo");
+        ImGui::TableSetupColumn("Brand");
+
         ImGui::TableHeadersRow();
 
-        for (int i = 0; i < static_cast<int>(brands.size()); i++) {
-            ImGui::PushID(brands[i].id);
-            ImGui::TableNextRow();
+        for (const Brand& brand : brands)
+        {
+            ImGui::TableNextRow(0, 72.0f);
 
             ImGui::TableSetColumnIndex(0);
-            ImGui::Text("%d", i + 1);
+
+            unsigned int texture = imageManager.GetTexture(brand.id);
+
+            if (texture != 0)
+            {
+                ImGui::Image(
+                    (ImTextureID)(intptr_t)texture,
+                    ImVec2(64.0f, 64.0f)
+                );
+            }
+            else
+            {
+                ImGui::Text("No logo");
+            }
 
             ImGui::TableSetColumnIndex(1);
-            if (ImGui::Selectable(brands[i].name.c_str(), selectedBrandID == brands[i].id)) {
-                selectedBrandID = brands[i].id;
-                typeWindow.Show(brands[i].id, brands[i].name);
+
+            ImGui::PushID(brand.id);
+
+            if (ImGui::Selectable(
+                brand.name.c_str(),
+                selectedBrandID == brand.id))
+            {
+                selectedBrandID = brand.id;
+                typeWindow.Show(brand.id, brand.name);
             }
 
             ImGui::PopID();
         }
+
         ImGui::EndTable();
     }
-}
-
-void BrandWindow::Reload() {
-    brands = db.GetBrands();
 }

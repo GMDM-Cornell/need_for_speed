@@ -1,30 +1,20 @@
-
 #pragma once
 
-#include <vector>
+#include "IWindow.h"
 #include "Database.h"
-#include "Window.h"
-#include "TypeWindow.h"
-#include "BrandWindow.h"
-#include "DetailedWindow.h"
-#include "EditTypeWindow.h"
+#include "ImageManager.h"
 
-struct GLFWwindow;
+#include <memory>
+#include <vector>
 
-class App {
+class App
+{
 private:
-    Database& db;
-
-    GLFWwindow* window = nullptr;
-
-    EditTypeWindow editTypeWindow;
-    TypeWindow typeWindow;
-    BrandWindow brandWindow;
-    DetailedWindow detailedWindow;
-
-    std::vector<Window*> windows;
+    std::vector<std::unique_ptr<IWindow>> windows;
 
 public:
-    App(Database& database);
-    int Run();
+    App(Database& database, ImageManager& imageManager);
+
+    void AddWindow(std::unique_ptr<IWindow> window, bool openAtStart = false);
+    void Render();
 };

@@ -1,51 +1,86 @@
 #pragma once
-#include <memory>
+
 #include <string>
 #include <vector>
-#include <mariadb/conncpp.hpp>
+#include <memory>
+#include <cstdint>
 
-struct CarDetails {
-    std::string country;
-    std::string city;
-    std::string brand;
-    std::string type;
-    int pk = 0;
-};
+namespace sql
+{
+    class Connection;
+}
 
-struct ListItem {
+struct Brand
+{
     int id;
     std::string name;
 };
 
-struct BrandLocation {
+struct VehicleType
+{
+    int id;
+    int brandID;
+    std::string name;
+};
+
+struct BrandLocation
+{
+    int countryID;
     std::string country;
+    int cityID;
     std::string city;
 };
 
-struct TypeEdit {
-    int id = 0;                      
-    int brandID = 0;
-    std::string brandName;
-    std::string name;
-    int pk = 0;
+struct CarDetails
+{
+    int modelID;
+    int vehicleTypeID;
+    std::string vehicleTypeName;
+    std::string modelName;
+    int powerPS;
 };
 
-class Database {
+class Database
+{
 private:
     std::unique_ptr<sql::Connection> conn;
     std::string lastError;
 
+    int GetOrCreateCountryID(const std::string& country);
+    int GetOrCreateCityID(const std::string& city, int countryID);
+
 public:
+    Database();
+    ~Database();
+
     bool Connect(const std::string& user, const std::string& password);
-    const std::string& GetLastError() const;
 
-    std::vector<ListItem> GetBrands();
-    std::vector<ListItem> GetTypes(int brandID);
+    std::string GetLastError() const;
+
+    std::vector<std::uint8_t> GetBrandLogo(int brandID);
+    std::vector<Brand> GetBrands();
+    std::vector<VehicleType> GetTypes(int brandID);
+    std::vector<CarDetails> GetCarDetails(int typeID);
+
     BrandLocation GetBrandLocation(int brandID);
-    CarDetails GetCarDetails(int typeID);
 
-    TypeEdit GetTypeForEdit(int typeID);
-    bool AddType(int brandID, const std::string& name, int pk);
-    bool EditType(const TypeEdit& original, const std::string& newName, int newPk);
-    bool DeleteType(const TypeEdit& original);
+    bool UpdateBrandLocation(
+        int brandID,
+        const std::string& country,
+        const std::string& city
+    );
+
+    bool UpdateVehicleType(int vehicleTypeID, const std::string& name);
+
+    bool UpdateModel(int modelID, const std::string& name, int powerPS);
+
+    bool AddVehicleType(int brandID, const std::string& name);
+
+    bool AddModel(int vehicleTypeID, const std::string& name, int powerPS);
+
+    bool DeleteVehicleType(int vehicleTypeID);
+
+    bool DeleteModel(int modelID);
+
+    bool UpdateCarType(const CarDetails& details);
 };

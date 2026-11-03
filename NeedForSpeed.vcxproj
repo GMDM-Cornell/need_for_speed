@@ -155,8 +155,9 @@
     <ClCompile Include="BrandWindow.cpp" />
     <ClCompile Include="Database.cpp" />
     <ClCompile Include="DetailedWindow.cpp" />
-    <ClCompile Include="EditTypeWindow.cpp" />
     <ClCompile Include="EditWindow.cpp" />
+    <ClCompile Include="ImageManager.cpp" />
+    <ClCompile Include="IWindow.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="TypeWindow.cpp" />
     <ClCompile Include="Window.cpp" />
@@ -166,8 +167,10 @@
     <ClInclude Include="BrandWindow.h" />
     <ClInclude Include="Database.h" />
     <ClInclude Include="DetailedWindow.h" />
-    <ClInclude Include="EditTypeWindow.h" />
     <ClInclude Include="EditWindow.h" />
+    <ClInclude Include="ImageManager.h" />
+    <ClInclude Include="IWindow.h" />
+    <ClInclude Include="stb_image.h" />
     <ClInclude Include="TypeWindow.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>

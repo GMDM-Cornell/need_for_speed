@@ -1,21 +1,30 @@
 #pragma once
-#include <vector>
+
 #include "Window.h"
 #include "Database.h"
+#include "ImageManager.h"
 
 class TypeWindow;
 
-class BrandWindow : public Window {
+class BrandWindow : public Window
+{
 private:
     Database& db;
+    ImageManager& imageManager;
     TypeWindow& typeWindow;
-    std::vector<ListItem> brands;
+
+    std::vector<Brand> brands;
+
     int selectedBrandID = -1;
 
-protected:
-    void DrawContent() override;
+    void RefreshBrands();
 
 public:
-    void Reload() override;
-    BrandWindow(Database& database, TypeWindow& typeWin);
+    BrandWindow(
+        Database& database,
+        ImageManager& imageManager,
+        TypeWindow& typeWindow
+    );
+
+    void DrawContent() override;
 };

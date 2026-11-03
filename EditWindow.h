@@ -1,27 +1,38 @@
 #pragma once
-#include <string>
+
 #include "Window.h"
 #include "Database.h"
 
-// Abstract base class for all edit windows.
-// It draws the Save / Cancel / Delete buttons, the delete confirmation and the error message.
-// A derived class only supplies its own input fields and what saving / deleting does.
-class EditWindow : public Window {
-protected:
+#include <functional>
+
+class EditWindow : public Window
+{
+private:
     Database& db;
-    std::string errorMessage;           // shown in red under the fields
-    bool dataChanged = false;           // true after a successful save or delete
 
-    virtual void DrawFields() = 0;      // abstract: the input fields
-    virtual bool Save() = 0;            // abstract: write to the database, true = success
-    virtual bool Delete() = 0;          // abstract: delete from the database, true = success
-    virtual bool CanDelete() const = 0; // false while a new item is being added
+    int brandID = -1;
+    int modelID = -1;
+    int vehicleTypeID = -1;
 
-    void DrawContent() override;        // fields + buttons, the same for every edit window
+    char country[128] = {};
+    char city[128] = {};
+    char modelName[128] = {};
+
+    int powerPS = 0;
+
+    std::string saveError;
+
+    std::function<void()> onSaved;
 
 public:
-    EditWindow(Database& database, const std::string& windowTitle);
+    EditWindow(Database& database);
 
-    // Returns true once after a change, so App can reload the other windows.
-    bool TakeChanged();
+    void Show(
+        int selectedBrandID,
+        const BrandLocation& location,
+        const CarDetails& details,
+        std::function<void()> callback
+    );
+
+    void DrawContent() override;
 };

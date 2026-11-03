@@ -39,7 +39,10 @@
     <ClCompile Include="EditWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="EditTypeWindow.cpp">
+    <ClCompile Include="ImageManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -65,7 +68,13 @@
     <ClInclude Include="EditWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EditTypeWindow.h">
+    <ClInclude Include="stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ImageManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

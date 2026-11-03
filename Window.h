@@ -1,18 +1,25 @@
 #pragma once
+
+#include "IWindow.h"
 #include <string>
 
-class Window {
+class Window : public IWindow
+{
 protected:
     std::string title;
-    bool open = true;
-    bool closable = false;
+    bool open;
+    bool closable;
+
+public:
+    Window(const std::string& title, bool closable = true);
+    virtual ~Window() = default;
+
+    void Render() override;
 
     virtual void DrawContent() = 0;
 
-public:
-    virtual void Reload() {}
-    Window(const std::string& windowTitle);
-    virtual ~Window() = default;
+    void Open() override;
+    void Close() override;
 
-    void Render();
+    bool IsOpen() const override;
 };
