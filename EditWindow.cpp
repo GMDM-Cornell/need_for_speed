@@ -3,46 +3,49 @@
 
 #include <cstdio>
 
-EditWindow::EditWindow(Database& database)
+EditWindow::EditWindow(
+    IBrandRepository& brandRepository,
+    IModelRepository& modelRepository)
     : Window("Edit Car Details"),
-    db(database)
+    brandRepository(brandRepository),
+    modelRepository(modelRepository)
 {
 }
 
 void EditWindow::Show(
-    int selectedBrandID,
-    const BrandLocation& selectedLocation,
-    const CarDetails& details,
+    const Brand& brand,
+    const City& city,
+    const Country& country,
+    const Model& model,
     std::function<void()> callback)
 {
     saveError.clear();
 
-    brandID = selectedBrandID;
-    modelID = details.modelID;
-    vehicleTypeID = details.vehicleTypeID;
+    brandID = brand.id;
+    modelID = model.id;
 
     std::snprintf(
-        country,
-        sizeof(country),
+        countryName,
+        sizeof(countryName),
         "%s",
-        selectedLocation.country.c_str()
+        country.name.c_str()
     );
 
     std::snprintf(
-        city,
-        sizeof(city),
+        cityName,
+        sizeof(cityName),
         "%s",
-        selectedLocation.city.c_str()
+        city.name.c_str()
     );
 
     std::snprintf(
         modelName,
         sizeof(modelName),
         "%s",
-        details.modelName.c_str()
+        model.name.c_str()
     );
 
-    powerPS = details.powerPS;
+    powerPS = model.powerPS;
 
     onSaved = callback;
 
@@ -53,8 +56,8 @@ void EditWindow::DrawContent()
 {
     ImGui::Text("Edit headquarters");
 
-    ImGui::InputText("Country", country, sizeof(country));
-    ImGui::InputText("City", city, sizeof(city));
+    ImGui::InputText("Country", countryName, sizeof(countryName));
+    ImGui::InputText("City", cityName, sizeof(cityName));
 
     ImGui::Separator();
 
@@ -71,9 +74,9 @@ void EditWindow::DrawContent()
         {
             saveError = "Horsepower cannot be negative.";
         }
-        else if (db.UpdateBrandLocation(brandID, country, city))
+        else if (brandRepository.SetHeadquarters(brandID, cityName, countryName))
         {
-            if (db.UpdateModel(modelID, modelName, powerPS))
+            if (modelRepository.Update(modelID, modelName, powerPS))
             {
                 saveError.clear();
 
@@ -86,12 +89,12 @@ void EditWindow::DrawContent()
             }
             else
             {
-                saveError = db.GetLastError();
+                saveError = modelRepository.GetLastError();
             }
         }
         else
         {
-            saveError = db.GetLastError();
+            saveError = brandRepository.GetLastError();
         }
     }
 

@@ -3,30 +3,34 @@
 #include "imgui.h"
 
 #include <cstdint>
-#include <cmath>
 
 DetailedWindow::DetailedWindow(
-    Database& database,
+    IModelRepository& modelRepository,
     ImageManager& imageManager,
     EditWindow& editWindow)
     : Window("Car Details"),
-    db(database),
+    modelRepository(modelRepository),
     imageManager(imageManager),
     editWindow(editWindow)
 {
 }
 
-void DetailedWindow::Show(int brandID, const std::string& name, int typeID)
+void DetailedWindow::Show(
+    const Brand& selectedBrand,
+    const City& selectedCity,
+    const Country& selectedCountry,
+    const VehicleType& type)
 {
-    selectedBrandID = brandID;
-    selectedTypeID = typeID;
+    brand = selectedBrand;
+    city = selectedCity;
+    country = selectedCountry;
+
+    typeName = type.name;
+    selectedTypeID = type.id;
     selectedModelID = -1;
 
-    brandName = name;
     showKW = 0;
     errorMessage.clear();
-
-    location = db.GetBrandLocation(brandID);
 
     RefreshModels();
 
@@ -35,24 +39,24 @@ void DetailedWindow::Show(int brandID, const std::string& name, int typeID)
 
 void DetailedWindow::RefreshModels()
 {
-    models = db.GetCarDetails(selectedTypeID);
+    models = modelRepository.GetByType(selectedTypeID);
 
     selectedModelID = -1;
 
     if (models.size() == 1)
     {
-        selectedModelID = models[0].modelID;
+        selectedModelID = models[0].id;
     }
 }
 
 void DetailedWindow::DrawContent()
 {
-    ImGui::Text("Brand: %s", brandName.c_str());
+    ImGui::Text("Brand: %s", brand.name.c_str());
 
     ImGui::Text(
         "Headquarters: %s, %s",
-        location.city.c_str(),
-        location.country.c_str()
+        city.name.c_str(),
+        country.name.c_str()
     );
 
     ImGui::Separator();
@@ -69,18 +73,18 @@ void DetailedWindow::DrawContent()
 
     if (ImGui::Button("Add model"))
     {
-        if (db.AddModel(selectedTypeID, newModelName, newModelPowerPS))
+        if (modelRepository.Add(selectedTypeID, newModelName, newModelPowerPS))
         {
             errorMessage.clear();
 
             RefreshModels();
 
-            for (const CarDetails& model : models)
+            for (const Model& model : models)
             {
-                if (model.modelName == newModelName &&
+                if (model.name == newModelName &&
                     model.powerPS == newModelPowerPS)
                 {
-                    selectedModelID = model.modelID;
+                    selectedModelID = model.id;
                 }
             }
 
@@ -89,7 +93,7 @@ void DetailedWindow::DrawContent()
         }
         else
         {
-            errorMessage = db.GetLastError();
+            errorMessage = modelRepository.GetLastError();
         }
     }
 
@@ -111,22 +115,22 @@ void DetailedWindow::DrawContent()
             ImGui::TableSetupColumn("Model");
             ImGui::TableHeadersRow();
 
-            for (const CarDetails& model : models)
+            for (const Model& model : models)
             {
                 ImGui::TableNextRow();
                 ImGui::TableSetColumnIndex(0);
 
-                ImGui::PushID(model.modelID);
+                ImGui::PushID(model.id);
 
-                const char* modelName = model.modelName.empty()
+                const char* modelName = model.name.empty()
                     ? "Unspecified model"
-                    : model.modelName.c_str();
+                    : model.name.c_str();
 
                 if (ImGui::Selectable(
                     modelName,
-                    selectedModelID == model.modelID))
+                    selectedModelID == model.id))
                 {
-                    selectedModelID = model.modelID;
+                    selectedModelID = model.id;
                 }
 
                 ImGui::PopID();
@@ -136,11 +140,11 @@ void DetailedWindow::DrawContent()
         }
     }
 
-    const CarDetails* selectedModel = nullptr;
+    const Model* selectedModel = nullptr;
 
-    for (const CarDetails& model : models)
+    for (const Model& model : models)
     {
-        if (model.modelID == selectedModelID)
+        if (model.id == selectedModelID)
         {
             selectedModel = &model;
             break;
@@ -151,7 +155,7 @@ void DetailedWindow::DrawContent()
     {
         ImGui::Separator();
 
-        unsigned int texture = imageManager.GetTexture(selectedBrandID);
+        unsigned int texture = imageManager.GetTexture(brand.id);
 
         if (texture != 0)
         {
@@ -161,14 +165,11 @@ void DetailedWindow::DrawContent()
             );
         }
 
-        ImGui::Text(
-            "Vehicle type: %s",
-            selectedModel->vehicleTypeName.c_str()
-        );
+        ImGui::Text("Vehicle type: %s", typeName.c_str());
 
-        if (!selectedModel->modelName.empty())
+        if (!selectedModel->name.empty())
         {
-            ImGui::Text("Model: %s", selectedModel->modelName.c_str());
+            ImGui::Text("Model: %s", selectedModel->name.c_str());
         }
         else
         {
@@ -185,11 +186,7 @@ void DetailedWindow::DrawContent()
 
         if (showKW == 1)
         {
-            int powerKW = static_cast<int>(
-                std::round(selectedModel->powerPS * 0.7355f)
-                );
-
-            ImGui::Text("Power: %d kW", powerKW);
+            ImGui::Text("Power: %d kW", selectedModel->PowerKW());
         }
         else
         {
@@ -201,8 +198,9 @@ void DetailedWindow::DrawContent()
         if (ImGui::Button("Edit model"))
         {
             editWindow.Show(
-                selectedBrandID,
-                location,
+                brand,
+                city,
+                country,
                 *selectedModel,
                 [this]()
                 {
@@ -215,14 +213,14 @@ void DetailedWindow::DrawContent()
 
         if (ImGui::Button("Delete selected model"))
         {
-            if (db.DeleteModel(selectedModelID))
+            if (modelRepository.Remove(selectedModelID))
             {
                 errorMessage.clear();
                 RefreshModels();
             }
             else
             {
-                errorMessage = db.GetLastError();
+                errorMessage = modelRepository.GetLastError();
             }
         }
     }

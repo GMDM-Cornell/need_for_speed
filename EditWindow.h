@@ -1,21 +1,22 @@
 #pragma once
 
 #include "Window.h"
-#include "Database.h"
+#include "dal/IBrandRepository.h"
+#include "dal/IModelRepository.h"
 
 #include <functional>
 
 class EditWindow : public Window
 {
 private:
-    Database& db;
+    IBrandRepository& brandRepository;
+    IModelRepository& modelRepository;
 
     int brandID = -1;
     int modelID = -1;
-    int vehicleTypeID = -1;
 
-    char country[128] = {};
-    char city[128] = {};
+    char countryName[128] = {};
+    char cityName[128] = {};
     char modelName[128] = {};
 
     int powerPS = 0;
@@ -25,12 +26,16 @@ private:
     std::function<void()> onSaved;
 
 public:
-    EditWindow(Database& database);
+    EditWindow(
+        IBrandRepository& brandRepository,
+        IModelRepository& modelRepository
+    );
 
     void Show(
-        int selectedBrandID,
-        const BrandLocation& location,
-        const CarDetails& details,
+        const Brand& brand,
+        const City& city,
+        const Country& country,
+        const Model& model,
         std::function<void()> callback
     );
 

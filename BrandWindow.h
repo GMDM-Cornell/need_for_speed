@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Window.h"
-#include "Database.h"
+#include "dal/IBrandRepository.h"
 #include "ImageManager.h"
 
 class TypeWindow; //Forward declaration, because BrandWindow need TypeWindow without knowing it's content
@@ -9,7 +9,7 @@ class TypeWindow; //Forward declaration, because BrandWindow need TypeWindow wit
 class BrandWindow : public Window
 {
 private:
-    Database& db;
+    IBrandRepository& brandRepository;
     ImageManager& imageManager;
     TypeWindow& typeWindow;
 
@@ -21,7 +21,7 @@ private:
 
 public:
     BrandWindow(
-        Database& database,
+        IBrandRepository& brandRepository,
         ImageManager& imageManager,
         TypeWindow& typeWindow
     );

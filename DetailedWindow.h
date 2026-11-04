@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Window.h"
-#include "Database.h"
+#include "dal/IModelRepository.h"
 #include "ImageManager.h"
 
 class EditWindow;
@@ -9,18 +9,20 @@ class EditWindow;
 class DetailedWindow : public Window
 {
 private:
-    Database& db;
+    IModelRepository& modelRepository;
     ImageManager& imageManager;
     EditWindow& editWindow;
 
-    int selectedBrandID = -1;
+    Brand brand;
+    City city;
+    Country country;
+
     int selectedTypeID = -1;
     int selectedModelID = -1;
 
-    std::string brandName;
+    std::string typeName;
 
-    BrandLocation location;
-    std::vector<CarDetails> models;
+    std::vector<Model> models;
 
     int showKW = 0;
 
@@ -33,12 +35,17 @@ private:
 
 public:
     DetailedWindow(
-        Database& database,
+        IModelRepository& modelRepository,
         ImageManager& imageManager,
         EditWindow& editWindow
     );
 
-    void Show(int brandID, const std::string& brandName, int typeID);
+    void Show(
+        const Brand& brand,
+        const City& city,
+        const Country& country,
+        const VehicleType& type
+    );
 
     void DrawContent() override;
 };

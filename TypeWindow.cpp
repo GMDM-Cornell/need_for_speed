@@ -3,41 +3,89 @@
 #include "imgui.h"
 
 #include <cstdio>
+#include <optional>
 
-TypeWindow::TypeWindow(Database& database, DetailedWindow& detailedWindow)
+TypeWindow::TypeWindow(
+    ITypeRepository& typeRepository,
+    ICityRepository& cityRepository,
+    ICountryRepository& countryRepository,
+    DetailedWindow& detailedWindow)
     : Window("Vehicle Types"),
-    db(database),
+    typeRepository(typeRepository),
+    cityRepository(cityRepository),
+    countryRepository(countryRepository),
     detailedWindow(detailedWindow)
 {
 }
 
-void TypeWindow::Show(int brandID, const std::string& name)
+void TypeWindow::Show(const Brand& selectedBrand)
 {
-    selectedBrandID = brandID;
+    brand = selectedBrand;
     selectedTypeID = -1;
-    brandName = name;
     errorMessage.clear();
 
-    location = db.GetBrandLocation(brandID);
-
+    RefreshLocation();
     RefreshTypes();
 
     Open();
 }
 
+void TypeWindow::RefreshLocation()
+{
+    city = City{};
+    country = Country{};
+
+    if (brand.cityID == 0)
+    {
+        return;
+    }
+
+    std::optional<City> foundCity = cityRepository.GetByID(brand.cityID);
+
+    if (!foundCity)
+    {
+        errorMessage = cityRepository.GetLastError();
+        return;
+    }
+
+    city = *foundCity;
+
+    std::optional<Country> foundCountry = countryRepository.GetByID(city.countryID);
+
+    if (!foundCountry)
+    {
+        errorMessage = countryRepository.GetLastError();
+        return;
+    }
+
+    country = *foundCountry;
+}
+
 void TypeWindow::RefreshTypes()
 {
-    types = db.GetTypes(selectedBrandID);
+    types = typeRepository.GetByBrand(brand.id);
+}
+
+void TypeWindow::OpenDetails(int typeID)
+{
+    for (const VehicleType& type : types)
+    {
+        if (type.id == typeID)
+        {
+            detailedWindow.Show(brand, city, country, type);
+            return;
+        }
+    }
 }
 
 void TypeWindow::DrawContent()
 {
-    ImGui::Text("Brand: %s", brandName.c_str());
+    ImGui::Text("Brand: %s", brand.name.c_str());
 
     ImGui::Text(
         "Headquarters: %s, %s",
-        location.city.c_str(),
-        location.country.c_str()
+        city.name.c_str(),
+        country.name.c_str()
     );
 
     ImGui::Separator();
@@ -52,7 +100,7 @@ void TypeWindow::DrawContent()
 
     if (ImGui::Button("Add vehicle type"))
     {
-        if (db.AddVehicleType(selectedBrandID, newTypeName))
+        if (typeRepository.Add(brand.id, newTypeName))
         {
             newTypeName[0] = '\0';
             errorMessage.clear();
@@ -60,7 +108,7 @@ void TypeWindow::DrawContent()
         }
         else
         {
-            errorMessage = db.GetLastError();
+            errorMessage = typeRepository.GetLastError();
         }
     }
 
@@ -96,7 +144,7 @@ void TypeWindow::DrawContent()
                     type.name.c_str()
                 );
 
-                detailedWindow.Show(selectedBrandID, brandName, type.id);
+                OpenDetails(type.id);
             }
 
             ImGui::PopID();
@@ -119,20 +167,15 @@ void TypeWindow::DrawContent()
 
         if (ImGui::Button("Save vehicle type"))
         {
-            if (db.UpdateVehicleType(selectedTypeID, editedTypeName))
+            if (typeRepository.Rename(selectedTypeID, editedTypeName))
             {
                 errorMessage.clear();
                 RefreshTypes();
-
-                detailedWindow.Show(
-                    selectedBrandID,
-                    brandName,
-                    selectedTypeID
-                );
+                OpenDetails(selectedTypeID);
             }
             else
             {
-                errorMessage = db.GetLastError();
+                errorMessage = typeRepository.GetLastError();
             }
         }
 
@@ -140,7 +183,7 @@ void TypeWindow::DrawContent()
 
         if (ImGui::Button("Delete vehicle type"))
         {
-            if (db.DeleteVehicleType(selectedTypeID))
+            if (typeRepository.Remove(selectedTypeID))
             {
                 selectedTypeID = -1;
                 errorMessage.clear();
@@ -151,7 +194,7 @@ void TypeWindow::DrawContent()
             }
             else
             {
-                errorMessage = db.GetLastError();
+                errorMessage = typeRepository.GetLastError();
             }
         }
     }

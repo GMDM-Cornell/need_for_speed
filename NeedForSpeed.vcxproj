@@ -160,6 +160,12 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="TypeWindow.cpp" />
     <ClCompile Include="Window.cpp" />
+    <ClCompile Include="dal\BrandRepository.cpp" />
+    <ClCompile Include="dal\CityRepository.cpp" />
+    <ClCompile Include="dal\CountryRepository.cpp" />
+    <ClCompile Include="dal\ModelRepository.cpp" />
+    <ClCompile Include="dal\RepositoryBase.cpp" />
+    <ClCompile Include="dal\TypeRepository.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
@@ -172,6 +178,18 @@
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="TypeWindow.h" />
     <ClInclude Include="Window.h" />
+    <ClInclude Include="dal\BrandRepository.h" />
+    <ClInclude Include="dal\CityRepository.h" />
+    <ClInclude Include="dal\CountryRepository.h" />
+    <ClInclude Include="dal\Entities.h" />
+    <ClInclude Include="dal\IBrandRepository.h" />
+    <ClInclude Include="dal\ICityRepository.h" />
+    <ClInclude Include="dal\ICountryRepository.h" />
+    <ClInclude Include="dal\IModelRepository.h" />
+    <ClInclude Include="dal\ITypeRepository.h" />
+    <ClInclude Include="dal\ModelRepository.h" />
+    <ClInclude Include="dal\RepositoryBase.h" />
+    <ClInclude Include="dal\TypeRepository.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />

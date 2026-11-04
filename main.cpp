@@ -1,5 +1,5 @@
 #include "App.h"
-#include "Database.h"
+#include "database.h"
 #include "ImageManager.h"
 
 #include "imgui.h"
@@ -39,14 +39,14 @@ int main()
         nullptr
     );
 
-    glfwMaximizeWindow(window);
-
     if (window == nullptr)
     {
         std::cerr << "Failed to create GLFW window." << std::endl;
         glfwTerminate();
         return 1;
     }
+
+    glfwMaximizeWindow(window);
 
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);

@@ -5,11 +5,11 @@
 #include <cstdint>
 
 BrandWindow::BrandWindow(
-    Database& database,
+    IBrandRepository& brandRepository,
     ImageManager& imageManager,
     TypeWindow& typeWindow)
     : Window("Brands", false),
-    db(database),
+    brandRepository(brandRepository),
     imageManager(imageManager),
     typeWindow(typeWindow)
 {
@@ -20,22 +20,27 @@ void BrandWindow::RefreshBrands()
 {
     imageManager.Clear();
 
-    brands = db.GetBrands();
+    brands = brandRepository.GetAll();
 
     for (const Brand& brand : brands)
     {
-        std::vector<std::uint8_t> logo = db.GetBrandLogo(brand.id);
-
-        if (!logo.empty())
-        {
-            imageManager.LoadLogo(brand.id, logo);
-        }
+        imageManager.LoadLogo(brand.id, brand.logo);
     }
 }
 
 void BrandWindow::DrawContent()
 {
     ImGui::Text("Available brands");
+
+    if (brands.empty())
+    {
+        const std::string error = brandRepository.GetLastError();
+
+        if (!error.empty())
+        {
+            ImGui::TextWrapped("Error: %s", error.c_str());
+        }
+    }
 
     if (ImGui::BeginTable(
         "BrandTable",
@@ -76,7 +81,7 @@ void BrandWindow::DrawContent()
                 selectedBrandID == brand.id))
             {
                 selectedBrandID = brand.id;
-                typeWindow.Show(brand.id, brand.name);
+                typeWindow.Show(brand);
             }
 
             ImGui::PopID();

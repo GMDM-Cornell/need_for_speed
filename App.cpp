@@ -8,22 +8,32 @@
 #include <utility>
 
 App::App(Database& database, ImageManager& imageManager)
+    : countryRepository(database),
+      cityRepository(database),
+      brandRepository(database, cityRepository, countryRepository),
+      typeRepository(database),
+      modelRepository(database)
 {
-    auto editWindow = std::make_unique<EditWindow>(database);
+    auto editWindow = std::make_unique<EditWindow>(
+        brandRepository,
+        modelRepository
+    );
 
     auto detailedWindow = std::make_unique<DetailedWindow>(
-        database,
+        modelRepository,
         imageManager,
         *editWindow
     );
 
     auto typeWindow = std::make_unique<TypeWindow>(
-        database,
+        typeRepository,
+        cityRepository,
+        countryRepository,
         *detailedWindow
     );
 
     auto brandWindow = std::make_unique<BrandWindow>(
-        database,
+        brandRepository,
         imageManager,
         *typeWindow
     );

@@ -1,35 +1,46 @@
 #pragma once
 
 #include "Window.h"
-#include "Database.h"
+#include "dal/ICityRepository.h"
+#include "dal/ICountryRepository.h"
+#include "dal/ITypeRepository.h"
 
 class DetailedWindow;
 
 class TypeWindow : public Window
 {
 private:
-    Database& db;
+    ITypeRepository& typeRepository;
+    ICityRepository& cityRepository;
+    ICountryRepository& countryRepository;
     DetailedWindow& detailedWindow;
 
-    int selectedBrandID = -1;
-    int selectedTypeID = -1;
+    Brand brand;
+    City city;
+    Country country;
 
-    std::string brandName;
-
-    BrandLocation location;
     std::vector<VehicleType> types;
+
+    int selectedTypeID = -1;
 
     char newTypeName[128] = {};
     char editedTypeName[128] = {};
 
     std::string errorMessage;
 
+    void RefreshLocation();
     void RefreshTypes();
+    void OpenDetails(int typeID);
 
 public:
-    TypeWindow(Database& database, DetailedWindow& detailedWindow);
+    TypeWindow(
+        ITypeRepository& typeRepository,
+        ICityRepository& cityRepository,
+        ICountryRepository& countryRepository,
+        DetailedWindow& detailedWindow
+    );
 
-    void Show(int brandID, const std::string& name);
+    void Show(const Brand& brand);
 
     void DrawContent() override;
 };
