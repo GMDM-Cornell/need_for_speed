@@ -17,6 +17,7 @@ public:
     );
 
     std::vector<Brand> GetAll() override;
+    std::optional<Brand> GetByID(int brandID) override;
 
     bool SetHeadquarters(
         int brandID,

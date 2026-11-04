@@ -69,6 +69,51 @@ std::vector<Brand> BrandRepository::GetAll()
     return brands;
 }
 
+std::optional<Brand> BrandRepository::GetByID(int brandID)
+{
+    std::optional<Brand> brand;
+
+    Run([&]
+    {
+        std::unique_ptr<sql::PreparedStatement> statement(
+            Connection().prepareStatement(
+                "SELECT id, city_id, name, logo FROM brand WHERE id = ?"
+            )
+        );
+
+        statement->setInt(1, brandID);
+
+        std::unique_ptr<sql::ResultSet> result(statement->executeQuery());
+
+        if (result->next())
+        {
+            Brand found;
+
+            found.id = result->getInt("id");
+            found.name = result->getString("name");
+
+            if (!result->isNull("city_id"))
+            {
+                found.cityID = result->getInt("city_id");
+            }
+
+            if (!result->isNull("logo"))
+            {
+                std::unique_ptr<std::istream> blob(result->getBlob("logo"));
+
+                found.logo.assign(
+                    std::istreambuf_iterator<char>(*blob),
+                    std::istreambuf_iterator<char>()
+                );
+            }
+
+            brand = found;
+        }
+    });
+
+    return brand;
+}
+
 bool BrandRepository::SetHeadquarters(
     int brandID,
     const std::string& city,

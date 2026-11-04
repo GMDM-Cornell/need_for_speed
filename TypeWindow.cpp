@@ -6,11 +6,13 @@
 #include <optional>
 
 TypeWindow::TypeWindow(
+    IBrandRepository& brandRepository,
     ITypeRepository& typeRepository,
     ICityRepository& cityRepository,
     ICountryRepository& countryRepository,
     DetailedWindow& detailedWindow)
     : Window("Vehicle Types"),
+    brandRepository(brandRepository),
     typeRepository(typeRepository),
     cityRepository(cityRepository),
     countryRepository(countryRepository),
@@ -18,11 +20,20 @@ TypeWindow::TypeWindow(
 {
 }
 
-void TypeWindow::Show(const Brand& selectedBrand)
+void TypeWindow::Show(int brandID)
 {
-    brand = selectedBrand;
     selectedTypeID = -1;
     errorMessage.clear();
+
+    std::optional<Brand> foundBrand = brandRepository.GetByID(brandID);
+
+    if (!foundBrand)
+    {
+        errorMessage = brandRepository.GetLastError();
+        return;
+    }
+
+    brand = *foundBrand;
 
     RefreshLocation();
     RefreshTypes();

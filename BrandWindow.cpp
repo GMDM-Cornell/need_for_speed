@@ -81,7 +81,7 @@ void BrandWindow::DrawContent()
                 selectedBrandID == brand.id))
             {
                 selectedBrandID = brand.id;
-                typeWindow.Show(brand);
+                typeWindow.Show(brand.id);
             }
 
             ImGui::PopID();

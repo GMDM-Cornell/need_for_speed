@@ -26,6 +26,7 @@ App::App(Database& database, ImageManager& imageManager)
     );
 
     auto typeWindow = std::make_unique<TypeWindow>(
+        brandRepository,
         typeRepository,
         cityRepository,
         countryRepository,
