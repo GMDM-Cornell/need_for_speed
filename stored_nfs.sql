@@ -194,25 +194,13 @@ END//
 
 DELIMITER ;
 
-DROP FUNCTION IF EXISTS ps_to_kw;
-
-DELIMITER //
-
-CREATE FUNCTION ps_to_kw(p_power_ps INT)
-RETURNS INT
-DETERMINISTIC -- The function always work the same
-NO SQL
-RETURN ROUND(p_power_ps * 0.73549875, 2)//
-
-DELIMITER ;
-
 CREATE OR REPLACE VIEW vw_need_for_speed AS
 SELECT
     brand.name AS Brand,
     vehicle_type.name AS `Type`,
     model.name AS Model,
     model.power_ps AS `Vermogen [PS]`,
-    ps_to_kw(model.power_ps) AS `Vermogen [kW]`,
+    ROUND(model.power_ps * 0.73549875) AS `Vermogen [kW]`,
     CONCAT_WS(', ', city.name, country.name) AS Hoofdkantoor
 FROM vehicle_type
 INNER JOIN brand

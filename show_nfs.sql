@@ -1,2 +1,3 @@
 -- SELECT * FROM vw_need_for_speed;
 -- SELECT * FROM database_audit ORDER BY changed_at DESC;
+-- SELECT @@tx_isolation;
