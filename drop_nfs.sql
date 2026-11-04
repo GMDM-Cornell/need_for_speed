@@ -2,6 +2,10 @@ USE need_for_speed;
 
 SET FOREIGN_KEY_CHECKS = 0;
 
+DROP VIEW IF EXISTS vw_need_for_speed;
+
+DROP FUNCTION IF EXISTS ps_to_kw;
+
 DROP TABLE IF EXISTS model;
 DROP TABLE IF EXISTS vehicle_type;
 DROP TABLE IF EXISTS brand;

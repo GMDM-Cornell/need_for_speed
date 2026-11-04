@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS brand (
     FOREIGN KEY (city_id)
         REFERENCES city(id)
         ON UPDATE CASCADE
-        ON DELETE SET NULL
+        ON DELETE SET NULL 
 );
 
 CREATE TABLE IF NOT EXISTS vehicle_type (
