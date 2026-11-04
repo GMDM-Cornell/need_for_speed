@@ -39,13 +39,6 @@ int main()
         nullptr
     );
 
-    if (window == nullptr)
-    {
-        std::cerr << "Failed to create GLFW window." << std::endl;
-        glfwTerminate();
-        return 1;
-    }
-
     glfwMaximizeWindow(window);
 
     if (window == nullptr)

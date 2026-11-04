@@ -4,7 +4,7 @@
 #include "Database.h"
 #include "ImageManager.h"
 
-class TypeWindow;
+class TypeWindow; //Forward declaration, because BrandWindow need TypeWindow without knowing it's content
 
 class BrandWindow : public Window
 {

@@ -157,7 +157,6 @@
     <ClCompile Include="DetailedWindow.cpp" />
     <ClCompile Include="EditWindow.cpp" />
     <ClCompile Include="ImageManager.cpp" />
-    <ClCompile Include="IWindow.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="TypeWindow.cpp" />
     <ClCompile Include="Window.cpp" />

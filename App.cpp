@@ -28,7 +28,7 @@ App::App(Database& database, ImageManager& imageManager)
         *typeWindow
     );
 
-    AddWindow(std::move(editWindow));
+    AddWindow(std::move(editWindow)); //Move ownership to App
     AddWindow(std::move(detailedWindow));
     AddWindow(std::move(typeWindow));
     AddWindow(std::move(brandWindow), true);
@@ -46,7 +46,7 @@ void App::AddWindow(std::unique_ptr<IWindow> window, bool openAtStart)
 
 void App::Render()
 {
-    for (const auto& window : windows)
+    for (const auto& window : windows) //Auto makes C++ choose the data type
     {
         window->Render();
     }
