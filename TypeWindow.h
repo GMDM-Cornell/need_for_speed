@@ -1,20 +1,20 @@
 #pragma once
 
 #include "Window.h"
-#include "dal/IBrandRepository.h"
-#include "dal/ICityRepository.h"
-#include "dal/ICountryRepository.h"
-#include "dal/ITypeRepository.h"
+#include "dal/BrandRepository.h"
+#include "dal/CityRepository.h"
+#include "dal/CountryRepository.h"
+#include "dal/TypeRepository.h"
 
 class DetailedWindow;
 
 class TypeWindow : public Window
 {
 private:
-    IBrandRepository& brandRepository;
-    ITypeRepository& typeRepository;
-    ICityRepository& cityRepository;
-    ICountryRepository& countryRepository;
+    BrandRepository& brandRepository;
+    TypeRepository& typeRepository;
+    CityRepository& cityRepository;
+    CountryRepository& countryRepository;
     DetailedWindow& detailedWindow;
 
     Brand brand;
@@ -36,10 +36,10 @@ private:
 
 public:
     TypeWindow(
-        IBrandRepository& brandRepository,
-        ITypeRepository& typeRepository,
-        ICityRepository& cityRepository,
-        ICountryRepository& countryRepository,
+        BrandRepository& brandRepository,
+        TypeRepository& typeRepository,
+        CityRepository& cityRepository,
+        CountryRepository& countryRepository,
         DetailedWindow& detailedWindow
     );
 

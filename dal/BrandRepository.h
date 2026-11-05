@@ -1,33 +1,35 @@
 #pragma once
 
-#include "IBrandRepository.h"
+#include "Entities.h"
 #include "RepositoryBase.h"
 
-class Database;
-class ICityRepository;
-class ICountryRepository;
+#include <optional>
 
-class BrandRepository : public IBrandRepository, private RepositoryBase
+class Database;
+class CityRepository;
+class CountryRepository;
+
+class BrandRepository : private RepositoryBase
 {
 public:
     BrandRepository(
         Database& database,
-        ICityRepository& cityRepository,
-        ICountryRepository& countryRepository
+        CityRepository& cityRepository,
+        CountryRepository& countryRepository
     );
 
-    std::vector<Brand> GetAll() override;
-    std::optional<Brand> GetByID(int brandID) override;
+    std::vector<Brand> GetAll();
+    std::optional<Brand> GetByID(int brandID);
 
     bool SetHeadquarters(
         int brandID,
         const std::string& city,
         const std::string& country
-    ) override;
+    );
 
-    std::string GetLastError() const override;
+    std::string GetLastError() const;
 
 private:
-    ICityRepository& cityRepository;
-    ICountryRepository& countryRepository;
+    CityRepository& cityRepository;
+    CountryRepository& countryRepository;
 };

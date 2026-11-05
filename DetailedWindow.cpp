@@ -5,7 +5,7 @@
 #include <cstdint>
 
 DetailedWindow::DetailedWindow(
-    IModelRepository& modelRepository,
+    ModelRepository& modelRepository,
     ImageManager& imageManager,
     EditWindow& editWindow)
     : Window("Car Details"),

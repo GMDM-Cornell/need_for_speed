@@ -1,16 +1,16 @@
 #pragma once
 
 #include "Window.h"
-#include "dal/IBrandRepository.h"
-#include "dal/IModelRepository.h"
+#include "dal/BrandRepository.h"
+#include "dal/ModelRepository.h"
 
 #include <functional>
 
 class EditWindow : public Window
 {
 private:
-    IBrandRepository& brandRepository;
-    IModelRepository& modelRepository;
+    BrandRepository& brandRepository;
+    ModelRepository& modelRepository;
 
     int brandID = -1;
     int modelID = -1;
@@ -27,8 +27,8 @@ private:
 
 public:
     EditWindow(
-        IBrandRepository& brandRepository,
-        IModelRepository& modelRepository
+        BrandRepository& brandRepository,
+        ModelRepository& modelRepository
     );
 
     void Show(

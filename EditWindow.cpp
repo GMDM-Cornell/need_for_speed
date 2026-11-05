@@ -4,8 +4,8 @@
 #include <cstdio>
 
 EditWindow::EditWindow(
-    IBrandRepository& brandRepository,
-    IModelRepository& modelRepository)
+    BrandRepository& brandRepository,
+    ModelRepository& modelRepository)
     : Window("Edit Car Details"),
     brandRepository(brandRepository),
     modelRepository(modelRepository)

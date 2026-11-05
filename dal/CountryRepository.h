@@ -1,16 +1,18 @@
 #pragma once
 
-#include "ICountryRepository.h"
+#include "Entities.h"
 #include "RepositoryBase.h"
+
+#include <optional>
 
 class Database;
 
-class CountryRepository : public ICountryRepository, private RepositoryBase
+class CountryRepository : private RepositoryBase
 {
 public:
     explicit CountryRepository(Database& database);
 
-    std::optional<Country> GetByID(int id) override;
-    int FindOrCreate(const std::string& name) override;
-    std::string GetLastError() const override;
+    std::optional<Country> GetByID(int id);
+    int FindOrCreate(const std::string& name);
+    std::string GetLastError() const;
 };

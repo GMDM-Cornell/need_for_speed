@@ -98,31 +98,16 @@
     <ClInclude Include="dal\RepositoryBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="dal\ICountryRepository.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="dal\CountryRepository.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="dal\ICityRepository.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="dal\CityRepository.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="dal\IBrandRepository.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="dal\BrandRepository.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="dal\ITypeRepository.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="dal\TypeRepository.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="dal\IModelRepository.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="dal\ModelRepository.h">

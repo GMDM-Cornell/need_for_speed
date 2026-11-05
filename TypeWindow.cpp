@@ -6,10 +6,10 @@
 #include <optional>
 
 TypeWindow::TypeWindow(
-    IBrandRepository& brandRepository,
-    ITypeRepository& typeRepository,
-    ICityRepository& cityRepository,
-    ICountryRepository& countryRepository,
+    BrandRepository& brandRepository,
+    TypeRepository& typeRepository,
+    CityRepository& cityRepository,
+    CountryRepository& countryRepository,
     DetailedWindow& detailedWindow)
     : Window("Vehicle Types"),
     brandRepository(brandRepository),

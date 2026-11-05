@@ -1,13 +1,16 @@
 # DAL — what changed
 
-All SQL moved out of `Database` into one repository per table, behind an interface.
+All SQL moved out of `Database` into one repository per table.
 The windows no longer include `database.h` and know nothing about tables, columns or SQL.
+
+This branch has no `I*Repository` interfaces: the windows hold the concrete repositories.
+`IWindow` is still in place, so the "minimaal één interface" bullet stays covered.
 
 ```
 Applicatie   App, the four windows, ImageManager         (no SQL, no table names)
    |
-Repository   IBrandRepository / ITypeRepository / IModelRepository
-             ICityRepository  / ICountryRepository      (business queries, returns entities)
+Repository   BrandRepository / TypeRepository / ModelRepository
+             CityRepository  / CountryRepository       (business queries, returns entities)
    |
 DAO part     the same classes: one table each, CRUD only
    |
@@ -22,16 +25,18 @@ The deck (Les 5, slide 12) allows the repository and the DAO role in one class:
 | File | What it is |
 |---|---|
 | `dal/Entities.h` | one struct per table: `Country`, `City`, `Brand`, `VehicleType`, `Model` |
-| `dal/IBrandRepository.h` + `BrandRepository.*` | brands incl. logo, and moving a brand's headquarters |
-| `dal/ITypeRepository.h` + `TypeRepository.*` | vehicle types of one brand |
-| `dal/IModelRepository.h` + `ModelRepository.*` | models of one vehicle type |
-| `dal/ICityRepository.h` + `CityRepository.*` | city, with find-or-create on `UNIQUE(country_id, name)` |
-| `dal/ICountryRepository.h` + `CountryRepository.*` | country, with find-or-create on `UNIQUE(name)` |
+| `dal/BrandRepository.*` | brands incl. logo, and moving a brand's headquarters |
+| `dal/TypeRepository.*` | vehicle types of one brand |
+| `dal/ModelRepository.*` | models of one vehicle type |
+| `dal/CityRepository.*` | city, with find-or-create on `UNIQUE(country_id, name)` |
+| `dal/CountryRepository.*` | country, with find-or-create on `UNIQUE(name)` |
 | `dal/RepositoryBase.*` | connection + error handling shared by the five repositories |
 | `database.*` | now only `Connect`, `IsConnected`, `GetConnection`, `GetLastError` |
 
-Windows take interfaces (`IBrandRepository&`), so a swap or a fake is possible and the
-diagram arrow ends on the interface, not on a concrete class.
+Windows take the concrete repositories (`BrandRepository&`). Everything else is unchanged:
+SQL still lives only in `dal/`, and `BrandWindow.cpp` still has no query and no table name.
+What you lose is the seam: there is no second type a window could be handed, so the
+klassendiagram arrow ends on a class that owns a connection.
 
 Two things the old code got wrong and this fixes:
 

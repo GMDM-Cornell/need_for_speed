@@ -182,11 +182,6 @@
     <ClInclude Include="dal\CityRepository.h" />
     <ClInclude Include="dal\CountryRepository.h" />
     <ClInclude Include="dal\Entities.h" />
-    <ClInclude Include="dal\IBrandRepository.h" />
-    <ClInclude Include="dal\ICityRepository.h" />
-    <ClInclude Include="dal\ICountryRepository.h" />
-    <ClInclude Include="dal\IModelRepository.h" />
-    <ClInclude Include="dal\ITypeRepository.h" />
     <ClInclude Include="dal\ModelRepository.h" />
     <ClInclude Include="dal\RepositoryBase.h" />
     <ClInclude Include="dal\TypeRepository.h" />

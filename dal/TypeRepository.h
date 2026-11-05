@@ -1,19 +1,19 @@
 #pragma once
 
-#include "ITypeRepository.h"
+#include "Entities.h"
 #include "RepositoryBase.h"
 
 class Database;
 
-class TypeRepository : public ITypeRepository, private RepositoryBase
+class TypeRepository : private RepositoryBase
 {
 public:
     explicit TypeRepository(Database& database);
 
-    std::vector<VehicleType> GetByBrand(int brandID) override;
-    bool Add(int brandID, const std::string& name) override;
-    bool Rename(int vehicleTypeID, const std::string& name) override;
-    bool Remove(int vehicleTypeID) override;
+    std::vector<VehicleType> GetByBrand(int brandID);
+    bool Add(int brandID, const std::string& name);
+    bool Rename(int vehicleTypeID, const std::string& name);
+    bool Remove(int vehicleTypeID);
 
-    std::string GetLastError() const override;
+    std::string GetLastError() const;
 };

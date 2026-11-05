@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Window.h"
-#include "dal/IModelRepository.h"
+#include "dal/ModelRepository.h"
 #include "ImageManager.h"
 
 class EditWindow;
@@ -9,7 +9,7 @@ class EditWindow;
 class DetailedWindow : public Window
 {
 private:
-    IModelRepository& modelRepository;
+    ModelRepository& modelRepository;
     ImageManager& imageManager;
     EditWindow& editWindow;
 
@@ -35,7 +35,7 @@ private:
 
 public:
     DetailedWindow(
-        IModelRepository& modelRepository,
+        ModelRepository& modelRepository,
         ImageManager& imageManager,
         EditWindow& editWindow
     );

@@ -1,7 +1,7 @@
 #include "BrandRepository.h"
 
-#include "ICityRepository.h"
-#include "ICountryRepository.h"
+#include "CityRepository.h"
+#include "CountryRepository.h"
 #include "../database.h"
 
 #include <mariadb/conncpp.hpp>
@@ -13,8 +13,8 @@
 
 BrandRepository::BrandRepository(
     Database& database,
-    ICityRepository& cityRepository,
-    ICountryRepository& countryRepository)
+    CityRepository& cityRepository,
+    CountryRepository& countryRepository)
     : RepositoryBase(database),
       cityRepository(cityRepository),
       countryRepository(countryRepository)

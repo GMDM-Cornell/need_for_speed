@@ -5,7 +5,7 @@
 #include <cstdint>
 
 BrandWindow::BrandWindow(
-    IBrandRepository& brandRepository,
+    BrandRepository& brandRepository,
     ImageManager& imageManager,
     TypeWindow& typeWindow)
     : Window("Brands", false),
